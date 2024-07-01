@@ -214,7 +214,7 @@ export default function Home() {
         </div>
 
         <button
-          className={`mt-5 bg-yellow-700 hover:bg-opacity-80 text-white rounded-lg px-4 py-2 duration-200 w-full ${
+          className={`mt-5 bg-yellow-600 hover:bg-opacity-80 text-white rounded-lg px-4 py-2 duration-200 w-full ${
             isLoadingSendMessage || message.length > MAX_SMS_LENGTH || !uploaded ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           type="button"

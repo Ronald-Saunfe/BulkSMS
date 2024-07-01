@@ -1,39 +1,41 @@
 FROM node:18-alpine AS base
 
-FROM base AS deps
-RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-COPY package*.json ./
+# Copy package.json and package-lock.json
+COPY package.json package-lock.json ./
+
+# Install dependencies
 RUN npm ci
 
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+# Copy the rest of the application code to the working directory
 COPY . .
 
-ENV NEXT_TELEMETRY_DISABLED 1
-
+# Build the Next.js application
 RUN npm run build
 
-FROM base AS runner
+# Production image
+FROM node:18-alpine AS runner
+
 WORKDIR /app
 
 ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Copy the built application from the builder stage
+COPY --from=base /app/public ./public
+COPY --from=base /app/.next ./.next
+COPY --from=base /app/node_modules ./node_modules
+COPY --from=base /app/package.json ./package.json
 
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
+# Set the correct permission for prerender cache
+RUN mkdir -p .next/cache
+RUN chown -R node:node .next/cache
 
-USER nextjs
+USER node
 
 EXPOSE 3000
 
 ENV PORT 3000
 
+# Use the Next.js start command to start the server
 CMD ["npm", "start"]

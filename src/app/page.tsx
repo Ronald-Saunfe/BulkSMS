@@ -75,7 +75,7 @@ export default function Home() {
       setActionText("Message sent successfully");
     } catch (error) {
       console.error("Error sending message:", error);
-      setActionText(`Error sending message: ${error.message}`);
+      setActionText(`Error sending message:`);
     } finally {
       setIsLoadingSendMessage(false);
     }
@@ -96,7 +96,7 @@ export default function Home() {
       setActionText("Balance fetched successfully");
     } catch (error) {
       console.error("Error fetching balance:", error);
-      setActionText(`Error fetching balance: ${error.message}`);
+      setActionText(`Error fetching balance: `);
     } finally {
       setIsLoadingFetchBalance(false);
     }
